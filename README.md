@@ -25,16 +25,20 @@ dotnet watch
 
 ## Architecture
 
-![](https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/wwwroot/img/pages/react/next-static-info.webp)
-
 ### Hybrid Development Approach
 
 **Development Mode:**
+
+![](https://raw.githubusercontent.com/ServiceStack/docs.servicestack.net/refs/heads/main/MyApp/wwwroot/img/pages/react/info/react-static-dev.svg)
+
 - ASP.NET Core proxies requests to Vite dev server (running on port 5173)
 - Hot Module Replacement (HMR) support for instant UI updates
 - WebSocket proxying for Vite HMR functionality
 
 **Production Mode:**
+
+![](https://raw.githubusercontent.com/ServiceStack/docs.servicestack.net/refs/heads/main/MyApp/wwwroot/img/pages/react/info/react-static-dev.svg)
+
 - Vite React app is statically exported to `/dist`
 - Static files served directly from ASP.NET Core's `/wwwroot`
 - No separate Node.js server required in production
