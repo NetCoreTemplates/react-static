@@ -37,7 +37,7 @@ dotnet watch
 
 **Production Mode:**
 
-![](https://raw.githubusercontent.com/ServiceStack/docs.servicestack.net/refs/heads/main/MyApp/wwwroot/img/pages/react/info/react-static-dev.svg)
+![](https://raw.githubusercontent.com/ServiceStack/docs.servicestack.net/refs/heads/main/MyApp/wwwroot/img/pages/react/info/react-static-prod.svg)
 
 - Vite React app is statically exported to `/dist`
 - Static files served directly from ASP.NET Core's `/wwwroot`
