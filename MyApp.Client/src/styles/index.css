@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@source "../../node_modules/@servicestack/react/dist/servicestack-react.mjs";
+
+@plugin "@tailwindcss/forms";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+    :root {
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 221.2 83.2% 53.3%;
+      --radius: 0.5rem;
+    }
+    :root.dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 212.7 26.8% 83.9%;
+    }
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+      border-color: hsl(var(--border));
+    }
+
+    html {
+      background-color: white;
+      color: rgb(17 24 39); /* gray-900 */
+    }
+
+    html.dark {
+      background-color: rgb(17 24 39); /* gray-900 */
+      color: rgb(243 244 246); /* gray-100 */
+    }
+
+    body {
+      background-color: inherit;
+      color: inherit;
+    }
+}
+
+@theme {
+    --default-ring-color: hsl(var(--ring));
+}
+
+/* Write your own custom base styles here */
+
+/* override element defaults */
+b, strong { font-weight:600; }
+[type='button'],button[type='submit']{cursor:pointer}
+
+/*typography*/
+.prose pre::-webkit-scrollbar, .prose code::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: #2d3748;
+}
+.prose pre::-webkit-scrollbar-thumb, .prose code::-webkit-scrollbar-thumb {
+    background-color: rgb(100 116 139);
+}
+code[class*=language-], pre[class*=language-] {
+    background-color:#1f2937;
+    min-width: fit-content;
+}
+.dark .prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *,pre code)) {
+    background-color: #172554; /* blue-950 */
+    color: #e5e7eb; /* gray-200 */
+}
+
+/* dark mode autocomplete fields */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:focus {
+    transition: background-color 600000s 0s, color 600000s 0s;
+}
+.dark input[data-autocompleted] {
+    background-color: transparent !important;
+}
