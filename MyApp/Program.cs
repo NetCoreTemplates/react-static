@@ -84,5 +84,10 @@ if (app.Environment.IsDevelopment())
 
     app.MapFallbackToNode(nodeProxy);
 }
+else
+{
+    // Map fallback to index.html in production (MyApp.Client/dist > wwwroot)
+    app.MapFallbackToFile("index.html");
+}
 
 app.Run();
