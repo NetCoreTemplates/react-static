@@ -47,9 +47,12 @@
   <Target Name="CreateAppDataFolder" BeforeTargets="Publish">
     <MakeDir Directories="$(PublishDir)App_Data" Condition="!Exists('$(PublishDir)App_Data')" />
     <Exec Command="npm run build" WorkingDirectory="../MyApp.Client" />
+    <Exec Command="npm install" />
+    <Exec Command="npm run ui:build" />
     <RemoveDir Directories="$(PublishDir)wwwroot" />
     <ItemGroup>
       <CopyDist Include="../MyApp.Client/dist/**/*.*" />
+      <CopyDist Include="./wwwroot/**/*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(CopyDist)" DestinationFiles="@(CopyDist->'$(PublishDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
