@@ -1,3 +1,6 @@
+// Complete declarative AutoQuery services for Bookings CRUD example:
+// https://docs.servicestack.net/autoquery-crud-bookings
+
 using System;
 using System.IO;
 using System.Collections;
@@ -10,10 +13,7 @@ using MyApp;
 namespace MyApp.ServiceModel;
 
 [Tag("Bookings")]
-[Route("/bookings/{Id}","GET")]
-[Route("/bookings","GET")]
 [AutoApply(Behavior.AuditQuery)]
-[Description("Find Bookings")]
 [ValidateHasRole("Employee")]
 public class QueryBookings : QueryDb<Booking>
 {
@@ -23,7 +23,6 @@ public class QueryBookings : QueryDb<Booking>
 
 [Tag("Bookings")]
 [AutoApply(Behavior.AuditCreate)]
-[Description("Create a new Booking")]
 [ValidateHasRole("Employee")]
 public class CreateBooking : ICreateDb<Booking>, IReturn<IdResponse>
 {
@@ -36,7 +35,6 @@ public class CreateBooking : ICreateDb<Booking>, IReturn<IdResponse>
     public DateTime? BookingEndDate { get; set; }
     [ValidateGreaterThan(0)]
     public decimal Cost { get; set; }
-    public string? CouponId { get; set; }
     [Input(Type="textarea")]
     public string? Notes { get; set; }
     public bool? Cancelled { get; set; }
@@ -56,7 +54,6 @@ public class UpdateBooking : IPatchDb<Booking>, IReturn<IdResponse>
     public DateTime? BookingEndDate { get; set; }
     [ValidateGreaterThan(0)]
     public decimal? Cost { get; set; }
-    public string? CouponId { get; set; }
     [Input(Type="textarea")]
     public string? Notes { get; set; }
     public bool? Cancelled { get; set; }
@@ -64,52 +61,12 @@ public class UpdateBooking : IPatchDb<Booking>, IReturn<IdResponse>
 
 [Tag("Bookings")]
 [AutoApply(Behavior.AuditSoftDelete)]
+[ValidateHasRole("Manager")]
 [ValidateHasRole("Employee")]
 public class DeleteBooking : IDeleteDb<Booking>, IReturnVoid
 {
     public int? Id { get; set; }
     public List<int>? Ids { get; set; }
-}
-
-[Tag("Bookings")]
-[AutoApply(Behavior.AuditQuery)]
-public class QueryCoupons : QueryDb<Coupon>
-{
-    public string? Id { get; set; }
-    public List<string>? Ids { get; set; }
-}
-
-[Tag("Bookings")]
-[AutoApply(Behavior.AuditCreate)]
-[ValidateIsAuthenticated]
-public class CreateCoupon : ICreateDb<Coupon>, IReturn<IdResponse>
-{
-    [ValidateNotEmpty]
-    public string Id { get; set; }
-    [ValidateNotEmpty]
-    public string Description { get; set; }
-    public decimal Discount { get; set; }
-    public DateTime? ExpiryDate { get; set; }
-}
-
-[Tag("Bookings")]
-[AutoApply(Behavior.AuditModify)]
-[ValidateIsAuthenticated]
-public class UpdateCoupon : IPatchDb<Coupon>, IReturn<IdResponse>
-{
-    public string Id { get; set; }
-    public string? Description { get; set; }
-    public decimal? Discount { get; set; }
-    public DateTime? ExpiryDate { get; set; }
-}
-
-[Tag("Bookings")]
-[AutoApply(Behavior.AuditSoftDelete)]
-[ValidateIsAuthenticated]
-public class DeleteCoupon : IDeleteDb<Coupon>, IReturnVoid
-{
-    public string? Id { get; set; }
-    public List<string>? Ids { get; set; }
 }
 
 
@@ -129,26 +86,11 @@ public class Booking : AuditBase
     public DateTime? BookingEndDate { get; set; }
     [IntlNumber(Currency="USD")]
     public decimal Cost { get; set; }
-    [Ref(Model=nameof(Coupon),RefId=nameof(Coupon.Id),RefLabel=nameof(Coupon.Description))]
-    [References(typeof(Coupon))]
-    public string? CouponId { get; set; }
-    [Format(FormatMethods.Hidden)]
-    [Reference]
-    public Coupon? Discount { get; set; }
     public string? Notes { get; set; }
     public bool? Cancelled { get; set; }
     [Format(FormatMethods.Hidden)]
     [Reference(SelfId=nameof(CreatedBy),RefId=nameof(User.UserName),RefLabel=nameof(User.DisplayName))]
     public User Employee { get; set; }
-}
-
-[Icon(Svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='currentColor' d='M2 9.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v5.5a2.5 2.5 0 1 0 0 5V20a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-5.5a2.5 2.5 0 1 0 0-5zm2-1.532a4.5 4.5 0 0 1 0 8.064V19h16v-2.968a4.5 4.5 0 0 1 0-8.064V5H4v2.968zM9 9h6v2H9V9zm0 4h6v2H9v-2z' /></svg>")]
-public class Coupon : AuditBase
-{
-    public string Id { get; set; }
-    public string Description { get; set; }
-    public decimal Discount { get; set; }
-    public DateTime? ExpiryDate { get; set; }
 }
 
 
