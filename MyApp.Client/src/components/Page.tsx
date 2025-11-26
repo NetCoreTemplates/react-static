@@ -12,8 +12,8 @@ const Page: FC<Props> = ({ title, className, bodyClass, children }) => {
     <>
       <div className="min-h-screen">
         <main>
-          <div className={`max-w-7xl mx-auto px-5 ${className ?? ''}`}>
-            <div className={bodyClass ?? 'max-w-5xl'}>
+          <div className={`px-5 ${className ?? ''}`}>
+            <div className={bodyClass ?? ''}>
               <h1 className="text-center text-4xl font-bold my-8 text-gray-900 dark:text-gray-100">{title}</h1>
               {children}
             </div>
