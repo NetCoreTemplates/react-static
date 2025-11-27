@@ -180,46 +180,69 @@ npm run test:ui     # Run tests with UI
 npm run test:run    # Run tests once
 ```
 
-**Backend:**
-```bash
-dotnet test
-```
+## Configuration
 
-### 5. Build for Production
-```bash
-cd MyApp.Client
-npm run publish
-```
-
-This builds the React client and bundles it with the .NET backend into `/bin/Release/net10.0/publish`.
-
-## Deployment Options
-
-### Docker
-
-Built-in container support with .NET SDK:
-
-```bash
-dotnet publish -c Release
-```
-
-### Kamal
-
-Zero-downtime deployments with included configuration:
-
-```bash
-kamal deploy
-```
-
-### Traditional Hosting
-Deploy as a standard ASP.NET Core application to IIS, Kestrel, or any hosting provider.
-
-## Key Configuration Files
+### Key Configuration Files
 
 - **MyApp/appsettings.json** - Application configuration
-- **MyApp.Client/vite.config.ts** - Vite configuration
+- **MyApp.Client/next.config.mjs** - Next.js configuration
 - **MyApp.Client/styles/index.css** - Tailwind CSS configuration
 - **config/deploy.yml** - Kamal deployment settings
+
+### App Settings
+
+Configure in `appsettings.json` or environment:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "DataSource=App_Data/app.db;Cache=Shared"
+  },
+  "SmtpConfig": {
+    "Host": "smtp.example.com",
+    "Port": 587,
+    "FromEmail": "noreply@example.com",
+    "FromName": "MyApp"
+  },
+  "AppConfig": {
+    "BaseUrl": "https://myapp.example.com"
+  }
+}
+```
+
+### App Settings Secrets
+
+Instead of polluting each GitHub Reposity with multiple App-specific GitHub Action Secrets, you can save all your secrets in a single `APPSETTINGS_PATCH` GitHub Action Secret to patch `appsettings.json` with environment-specific configuration using [JSON Patch](https://jsonpatch.com). E.g:
+
+```json
+[
+    {
+        "op":"replace",
+        "path":"/ConnectionStrings/DefaultConnection",
+        "value":"Server=service-postgres;Port=5432;User Id=dbuser;Password=dbpass;Database=dbname;Pooling=true;"
+    },
+    { "op":"add", "path":"/SmtpConfig", "value":{
+        "UserName": "SmptUser",
+        "Password": "SmptPass",
+        "Host": "email-smtp.us-east-1.amazonaws.com",
+        "Port": 587,
+        "From": "noreply@example.org",
+        "FromName": "MyApp",
+        "Bcc": "copy@example.org"
+      } 
+    },
+    { "op":"add", "path":"/Admins", "value": ["admin1@email.com","admin2@email.com"] },
+    { "op":"add", "path":"/CorsFeature/allowOriginWhitelist/-", "value":"https://servicestack.net" }
+]
+```
+
+### SMTP Email
+
+Enable email sending by uncommenting in `Program.cs`:
+
+```csharp
+services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
+```
 
 ## Upgrading to Enterprise Database
 
@@ -236,6 +259,56 @@ npx add-in ef-postgres
 ```bash
 npx add-in db-identity
 ```
+
+## Deployment
+
+### Docker + Kamal
+
+This project includes GitHub Actions for CI/CD with automatic Docker image builds and production [deployment with Kamal](https://docs.servicestack.net/kamal-deploy). The `/config/deploy.yml` configuration is designed to be reusable across projects—it dynamically derives service names, image paths, and volume mounts from environment variables, so you only need to configure your server's IP and hostname using GitHub Action secrets.
+
+### GitHub Action Secrets
+
+**Required - App Specific*:
+
+The only secret needed to be configured per Repository.
+
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `KAMAL_DEPLOY_HOST` | `example.org` | Hostname used for SSL certificate and Kamal proxy |
+
+**Required** (Organization Secrets):
+
+Other Required variables can be globally configured in your GitHub Organization or User secrets which will
+enable deploying all your Repositories to the same server.
+
+| Variable | Example  | Description |
+|----------|----------|-------------|
+| `KAMAL_DEPLOY_IP`   | `100.100.100.100` | IP address of the server to deploy to |
+| `SSH_PRIVATE_KEY`   | `ssh-rsa ...`     | SSH private key to access the server |
+| `LETSENCRYPT_EMAIL` | `me@example.org`  | Email for Let's Encrypt SSL certificate |
+
+**Optional**:
+
+| Variable | Example | Description |
+| `SERVICESTACK_LICENSE` | `...` | ServiceStack license key |
+
+**Inferred** (from GitHub Action context):
+
+These are inferred from the GitHub Action context and don't need to be configured.
+
+| Variable | Source | Description |
+|----------|--------|-------------|
+| `GITHUB_REPOSITORY` | `${{ github.repository }}` | e.g. `acme/example.org` - used for service name and image |
+| `KAMAL_REGISTRY_USERNAME` | `${{ github.actor }}` | GitHub username for container registry |
+| `KAMAL_REGISTRY_PASSWORD` | `${{ secrets.GITHUB_TOKEN }}` | GitHub token for container registry auth |
+
+#### Features
+
+- **Docker containerization** with optimized .NET images
+- **SSL auto-certification** via Let's Encrypt
+- **GitHub Container Registry** integration
+- **Volume persistence** for App_Data including any SQLite database
+
 
 ## AutoQuery CRUD Dev Workflow
 
