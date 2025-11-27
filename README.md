@@ -2,7 +2,7 @@
 
 React + Vite + TypeScript + Tailwind CSS project template with ServiceStack .NET backend.
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/react-static.png)](http://react-static.web-templates.io)
+![](https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/wwwroot/img/pages/react/react-static.webp)
 
 > Browse [source code](https://github.com/NetCoreTemplates/react-static), view live demo [react-static.web-templates.io](http://react-static.web-templates.io) and install with:
 
