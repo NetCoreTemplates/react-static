@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyApp.ServiceInterface\MyApp.ServiceInterface.csproj" />
+    <ProjectReference Include="..\MyApp.ServiceModel\MyApp.ServiceModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.*" />
@@ -29,11 +34,6 @@
     <PackageReference Include="ServiceStack.Extensions" Version="8.*" />
     <PackageReference Include="ServiceStack.Ormlite.Sqlite.Data" Version="8.*" />
     <PackageReference Include="ServiceStack.Jobs" Version="8.*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MyApp.ServiceInterface\MyApp.ServiceInterface.csproj" />
-    <ProjectReference Include="..\MyApp.ServiceModel\MyApp.ServiceModel.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
