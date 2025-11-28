@@ -290,6 +290,7 @@ enable deploying all your Repositories to the same server.
 **Optional**:
 
 | Variable | Example | Description |
+|----------|---------|-------------|
 | `SERVICESTACK_LICENSE` | `...` | ServiceStack license key |
 
 **Inferred** (from GitHub Action context):
