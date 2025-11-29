@@ -1,6 +1,6 @@
+using System.Net;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using MyApp.Data;
 using MyApp.ServiceInterface;
 
@@ -62,7 +62,6 @@ app.UseStaticFiles();
 app.MapCleanUrls();
 
 app.UseHttpsRedirection();
-app.UseWebSockets();
 app.UseAuthorization();
 app.MapRazorPages();
 
@@ -70,11 +69,10 @@ app.UseServiceStack(new AppHost(), options => {
     options.MapEndpoints();
 });
 
-// Proxy development fallback routes to the Vite server
+// Proxy development HMR WebSocket and fallback routes to the Node server
 if (app.Environment.IsDevelopment())
 {
-    // Map Vite HMR WebSocket early in the pipeline
-    app.UseWebSockets(); // Enable WebSockets for Vite HMR
+    app.UseWebSockets();
     app.MapViteHmr(nodeProxy);
 
     // Start the Vite dev server if the lockfile does not exist

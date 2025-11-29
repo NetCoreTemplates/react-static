@@ -1,4 +1,4 @@
-// Complete declarative AutoQuery services for Bookings CRUD example:
+﻿// Complete declarative AutoQuery services for Bookings CRUD example:
 // https://docs.servicestack.net/autoquery-crud-bookings
 
 using System;

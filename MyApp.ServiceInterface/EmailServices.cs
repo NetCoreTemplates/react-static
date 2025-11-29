@@ -14,15 +14,15 @@ public class SmtpConfig
     /// <summary>
     /// Username of the SMTP Server account
     /// </summary>
-    public string Username { get; set; }
+    public required string Username { get; set; }
     /// <summary>
     /// Password of the SMTP Server account
     /// </summary>
-    public string Password { get; set; }
+    public required string Password { get; set; }
     /// <summary>
     /// Hostname of the SMTP Server
     /// </summary>
-    public string Host { get; set; }
+    public required string Host { get; set; }
     /// <summary>
     /// Port of the SMTP Server
     /// </summary>
@@ -30,7 +30,7 @@ public class SmtpConfig
     /// <summary>
     /// Which email address to send emails from
     /// </summary>
-    public string FromEmail { get; set; }
+    public required string FromEmail { get; set; }
     /// <summary>
     /// The name of the Email Sender
     /// </summary>
@@ -47,9 +47,9 @@ public class SmtpConfig
 
 public class SendEmail
 {
-    public string To { get; set; }
+    public required string To { get; set; }
     public string? ToName { get; set; }
-    public string Subject { get; set; }
+    public required string Subject { get; set; }
     public string? BodyText { get; set; }
     public string? BodyHtml { get; set; }
 }

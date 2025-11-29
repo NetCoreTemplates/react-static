@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <ContainerLabel Include="service" Value="my-app" />
+    <ContainerLabel Include="service" Value="my-app" />
   </ItemGroup>
 
   <ItemGroup>
