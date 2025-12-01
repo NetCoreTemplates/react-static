@@ -14,6 +14,10 @@ A modern full-stack .NET 10.0 + React Vite project template that combines the po
 npx create-net react-static MyProject
 ```
 
+## Jumpstart with Copilot
+
+Instantly [scaffold a new App with this template](https://github.com/new?template_name=react-static&template_owner=NetCoreTemplates) using GitHub Copilot, just describe the features you want and watch Copilot build it!
+
 ## Getting Started
 
 Run Server .NET Project (automatically starts both .NET and Vite React dev servers):
