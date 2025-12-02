@@ -77,7 +77,7 @@ npx okai rm Table.d.ts
 ### Hybrid Development/Production Model
 
 **Development Mode:**
-- `dotnet watch` from MyApp starts both .NET (port 5001) and Vite dev server (port 5173)
+- `dotnet watch` from MyApp starts .NET (port 5001) and Vite dev server (port 5173), accesible via `https://localhost:5001`
 - ASP.NET Core proxies requests to Vite dev server via `NodeProxy` (configured in [Program.cs](MyApp/Program.cs#L41))
 - Hot Module Replacement (HMR) enabled via WebSocket proxying using `MapNotFoundToNode`, `MapViteHmr`, `RunNodeProcess`, `MapFallbackToNode` in [Program.cs](MyApp/Program.cs)
 
@@ -102,8 +102,8 @@ This pattern keeps [Program.cs](MyApp/Program.cs) clean and separates concerns. 
 ### Project Structure
 
 ```
-MyApp/                         # .NET Backend (hosts both .NET and React)
-├── Configure.*.cs             # Modular AppHost configuration
+MyApp/                         # .NET Backend (hosts both .NET and Vite React)
+├── Configure.*.cs             # Modular startup configuration
 ├── Migrations/                # EF Core Identity migrations + OrmLite app migrations
 ├── Pages/                     # Identity Auth Razor Pages
 └── wwwroot/                   # Production static files (from MyApp.Client/dist)
@@ -130,6 +130,14 @@ MyApp.ServiceInterface/        # Service implementations
 MyApp.Tests/                   # .NET tests (NUnit)
 ├── IntegrationTest.cs         # API integration tests
 └── MigrationTasks.cs          # Migration task runner
+
+config/
+└── deploy.yml                 # Kamal deployment settings
+.github/
+└── workflows/
+    ├── build.yml              # CI build and test
+    ├── build-container.yml    # Container image build
+    └── release.yml            # Production deployment with Kamal
 ```
 
 ### Database Architecture
@@ -176,7 +184,7 @@ The response type of an API should be specified in the `IReturn<Response>` marke
 
 By convention, APIs return single results in a `T? Result` property, APIs returns multiple results of the same type in a `List<T> Results` property. Otherwise APIs returning results of different types should use intuitive property names in a flat structured Response DTO for simplicity.
 
-These C# Server DTOs are used to generate TypeScript `dtos.ts`.
+These C# Server DTOs are used to generate the TypeScript `dtos.ts`.
 
 #### Validating APIs
 
