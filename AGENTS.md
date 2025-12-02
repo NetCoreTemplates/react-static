@@ -102,13 +102,13 @@ This pattern keeps [Program.cs](MyApp/Program.cs) clean and separates concerns. 
 ### Project Structure
 
 ```
-MyApp/                          # .NET Backend (hosts both .NET and React)
-├── Configure.*.cs              # Modular AppHost configuration
-├── Migrations/                 # EF Core Identity migrations + OrmLite app migrations
-├── Data/                       # EF Core DbContext and Identity models
-└── wwwroot/                    # Production static files (from MyApp.Client/dist)
+MyApp/                         # .NET Backend (hosts both .NET and React)
+├── Configure.*.cs             # Modular AppHost configuration
+├── Migrations/                # EF Core Identity migrations + OrmLite app migrations
+├── Pages/                     # Identity Auth Razor Pages
+└── wwwroot/                   # Production static files (from MyApp.Client/dist)
 
-MyApp.Client/                   # React Frontend
+MyApp.Client/                  # React Frontend
 ├── src/
 │   ├── lib/
 │   │   ├── dtos.ts            # Auto-generated from C# (via `npm run dtos`)
@@ -116,14 +116,16 @@ MyApp.Client/                   # React Frontend
 │   │   └── utils.ts           # Utility functions
 │   ├── components/            # React components
 │   └── styles/                # Tailwind CSS
-└── vite.config.ts             # API proxy config for dev mode
+└── vite.config.ts             # Vite config for dev mode
 
 MyApp.ServiceModel/            # DTOs & API contracts
 ├── *.cs                       # C# Request/Response DTOs
+├── api.d.ts                   # TypeScript data models Schema
 └── *.d.ts                     # TypeScript data models for okai code generation
 
 MyApp.ServiceInterface/        # Service implementations
-└── *Services.cs               # ServiceStack service classes
+├── Data/                      # EF Core DbContext and Identity models
+└── *Services.cs               # ServiceStack service implementations
 
 MyApp.Tests/                   # .NET tests (NUnit)
 ├── IntegrationTest.cs         # API integration tests
@@ -133,7 +135,7 @@ MyApp.Tests/                   # .NET tests (NUnit)
 ### Database Architecture
 
 **Dual ORM Strategy:**
-- **OrmLite**: All application data (faster, simpler, lighter typed ORM)
+- **OrmLite**: All application data (faster, simpler, typed POCO ORM)
 - **Entity Framework Core**: ASP.NET Core Identity tables only (Users, Roles, etc.)
 
 Both use the same SQLite database by default (`App_Data/app.db`). Connection string in `appsettings.json`.
@@ -149,7 +151,7 @@ Run `npm run migrate` to execute both.
 1. ASP.NET Core Identity handles user registration/login via Razor Pages at `/Identity/*` routes
 2. ServiceStack AuthFeature integrates with Identity via `IdentityAuth.For<ApplicationUser>()` in [Configure.Auth.cs](MyApp/Configure.Auth.cs)
 3. Custom claims added via `AdditionalUserClaimsPrincipalFactory` and `CustomUserSession`
-4. ServiceStack services use `[ValidateHasRole]` attributes for authorization (see [Bookings.cs](MyApp.ServiceModel/Bookings.cs))
+4. ServiceStack services use `[ValidateIsAuthenticated]` and `[ValidateHasRole]` attributes for authorization (see [Bookings.cs](MyApp.ServiceModel/Bookings.cs))
 
 ### ServiceStack .NET APIs
 
@@ -170,21 +172,21 @@ public class GetBookingResponse
 }
 ```
 
-The response type of an API should be specified in the `IReturn<Response>` marker interface. APIs which don't have any response should implement `IReturnVoid` instead.
+The response type of an API should be specified in the `IReturn<Response>` marker interface. APIs which don't return a response should implement `IReturnVoid` instead.
 
-By convention APIs returning a single result have a `T? Result` property whilst APIs returning multiple results of the same type have a `List<T> Results` property. Otherwise it's encouraged to use intuitive property names for APIs returning results of different types in a flat structured Response DTO for simplicity.
+By convention, APIs return single results in a `T? Result` property, APIs returns multiple results of the same type in a `List<T> Results` property. Otherwise APIs returning results of different types should use intuitive property names in a flat structured Response DTO for simplicity.
 
-These Server DTOs are what gets generated in `dtos.ts`.
+These C# Server DTOs are used to generate TypeScript `dtos.ts`.
 
 #### Validating APIs
 
-Any API Errors are automatically populated in the `ResponseStatus` property including when using [Declarative Validation Attributes](https://docs.servicestack.net/declarative-validation) like `[ValidateGreaterThan]` and `[ValidateNotEmpty]` which validate APIs and returned any structured error responses in `ResponseStatus`.
+Any API Errors are automatically populated in the `ResponseStatus` property, inc. [Declarative Validation Attributes](https://docs.servicestack.net/declarative-validation) like `[ValidateGreaterThan]` and `[ValidateNotEmpty]` which validate APIs and return any error responses in `ResponseStatus`.
 
 #### Protecting APIs
 
 The Type Validation Attributes below should be used to protect APIs:
 
-- `[ValidateIsAuthenticated]`	- Authenticated Users only
+- `[ValidateIsAuthenticated]` - Only Authenticated Users
 - `[ValidateIsAdmin]` - Only Admin Users
 - `[ValidateHasRole]` - Only Authenticated Users assigned with the specified role
 - `[ValidateApiKey]` - Only Users with a valid API Key
@@ -200,11 +202,11 @@ public class CreateBooking : ICreateDb<Booking>, IReturn<IdResponse>
 
 #### Primary HTTP Method
 
-APIs have a primary HTTP Method which if not specified uses HTTP **POST**. Use `IGet`, `IPost`, `IPut` or `IDelete` to change the HTTP Verb except for AutoQuery APIs which have implied verbs for each operation.
+APIs have a primary HTTP Method which if not specified uses HTTP **POST**. Use `IGet`, `IPost`, `IPut`, `IPatch` or `IDelete` to change the HTTP Verb except for AutoQuery APIs which have implied verbs for each CRUD operation.
 
 #### API Implementations
 
-Implementations of ServiceStack APIs should be added to the `MyApp.ServiceInterface` folder, e.g:
+ServiceStack API implementations should be added to `MyApp.ServiceInterface/`:
 
 ```csharp
 //MyApp.ServiceInterface/BookingServices.cs
@@ -228,11 +230,12 @@ public class BookingServices(IAutoQueryDb autoquery) : Service
 }
 ```
 
-APIs can be implemented with **sync** or **async** methods. The return type of an API implementation does not change behavior however it's encouraged to use `object` to encourage 
+APIs can be implemented with **sync** or **async** methods using `Any` or its primary HTTP Method e.g. `Get`, `Post`. 
+The return type of an API implementation does not change behavior however returning `object` is recommended so its clear the Request DTO `IReturn<Response>` interface defines the APIs Response type and Service Contract.
 
-The ServiceStack `Service` base class has convenience properties like `Db` to resolve an Open `IDbConnection` for that API and `base.Request` to resolve the `IRequest` context. All other dependencies required by the API should use a Primary Constructor with constructor injection.
+The ServiceStack `Service` base class has convenience properties like `Db` to resolve an Open `IDbConnection` for that API and `base.Request` to resolve the `IRequest` context. All other dependencies required by the API should use constructor injection in a Primary Constructor.
 
-A ServiceStack API typically returns the Response DTO defined in its Request DTO `IReturn<Response>` or an Error but can also return any [custom Return Type](https://docs.servicestack.net/service-return-types) like a raw `string`, `byte[]`, `Stream`, `IStreamWriter`, `HttpResult` and `HttpError`.
+A ServiceStack API typically returns the Response DTO defined in its Request DTO `IReturn<Response>` or an Error but can also return any raw [custom Return Type](https://docs.servicestack.net/service-return-types) like `string`, `byte[]`, `Stream`, `IStreamWriter`, `HttpResult` and `HttpError`.
 
 ### AutoQuery CRUD Pattern
 
@@ -249,12 +252,12 @@ ServiceStack's AutoQuery generates full CRUD APIs from declarative request DTOs.
 
 ### TypeScript DTO Generation
 
-After changing C# DTOs in `MyApp.ServiceModel/`, run:
+After changing C# DTOs in `MyApp.ServiceModel/`, restart the .NET Server then run:
 ```bash
 cd MyApp.Client && npm run dtos
 ```
 
-This calls ServiceStack's `/types/typescript` endpoint and updates `MyApp.Client/src/lib/dtos.ts` with type-safe client DTOs. The Vite dev server auto-reloads.
+This calls ServiceStack's `/types/typescript` endpoint and updates `dtos.ts` with type-safe client DTOs. The Vite dev server auto-reloads.
 
 ### okai AutoQuery Code Generation
 
@@ -357,7 +360,7 @@ AutoQuery also matches on pluralized fields where `Ids` matches `Id` and applies
 const api = client.api(new QueryBookings({ ids:[1,2,3] }))
 ```
 
-Multiple Request DTO properties applies mutliple **AND** Filters, e.g:
+Multiple Request DTO properties applies mutliple **AND** filters, e.g:
 
 ```typescript
 const api = client.api(new QueryBookings({ minCost:100, ids:[1,2,3] }))
@@ -380,7 +383,7 @@ const response = await client.api(new QueryBookings())
 
 The `client` is a configured `JsonServiceClient` pointing to `/api` (proxied to .NET backend).
 
-All .NET APIs are accessible by Request DTOs which implement a `IReturn<ResponseType>` or a `IReturnVoid` interface which defines the Response of an API, e.g:
+All .NET APIs are accessible by Request DTOs which implement either a `IReturn<ResponseType>` a `IReturnVoid` interface which defines the API Response, e.g:
 
 ```typescript
 export class Hello implements IReturn<HelloResponse>, IGet
@@ -397,7 +400,7 @@ export class HelloResponse
 
 ### ServiceStack API Client Pattern
 
-Inside a React Component use `useClient()` to resolve a Service Client. The `ApiResult` can be used to hold **loading**, **failed** and **successful** API Response states, e.g:
+Inside a React Component use `useClient()` to resolve a Service Client. The `ApiResult` can hold **loading**, **failed** and **successful** API Response states, e.g:
 
 ```typescript
 type Props = { value: string }
@@ -439,12 +442,12 @@ if (api.succeeded) {
 }
 ```
 
-The `apiForm` API can use a HTML Form's FormData for its Request Body together with the APIs **empty Request DTO**, e.g:
+The `apiForm` API can use a HTML Form's FormData for its Request Body together with an APIs **empty Request DTO**, e.g:
 
 ```typescript
 const submit = async (e: React.FormEvent) => {
-  const form = e.currentTarget as HTMLFormElement
-  const api = await client.apiForm(new CreateContact(), new FormData(form))
+    const form = e.currentTarget as HTMLFormElement
+    const api = await client.apiForm(new CreateContact(), new FormData(form))
     if (api.succeeded) {
         console.log(`The API succeded:`, api.response)
     } else if (api.error) {
