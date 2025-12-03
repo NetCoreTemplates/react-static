@@ -12,7 +12,7 @@
     "postinstall": "node ./postinstall.mjs"
   },
   "dependencies": {
-    "@servicestack/react": "^2.0.15",
+    "@servicestack/react": "^2.0.17",
     "@tailwindcss/forms": "^0.5.10",
     "clsx": "^2.1.1",
     "react": "^19.2.0",
