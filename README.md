@@ -378,7 +378,11 @@ npx okai rm Transaction.d.ts
 
 ## Learn More
 
+- [react-templates.net](https://react-templates.net)
+- [ServiceStack React Components](https://react.servicestack.net)
 - [ServiceStack Documentation](https://docs.servicestack.net)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [AutoQuery CRUD](https://docs.servicestack.net/autoquery-crud)
-- [ServiceStack Auth](https://docs.servicestack.net/authentication-and-authorization)
+- [Vite Documentation](https://vite.dev)
+- [React Documentation](https://react.dev)
+- [AutoQuery CRUD](https://react-templates.net/docs/autoquery/crud)
+- [Background Jobs](https://docs.servicestack.net/background-jobs)
+- [AI Chat API](https://docs.servicestack.net/ai-chat-api)
