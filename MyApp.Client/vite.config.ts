@@ -40,6 +40,7 @@ export default defineConfig({
         target: 'baseline-widely-available',
     },
     server: {
+        host: true, // Listen on all interfaces (both IPv4 and IPv6)
         proxy,        
     }    
 })

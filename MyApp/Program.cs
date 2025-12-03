@@ -76,7 +76,6 @@ if (app.Environment.IsDevelopment())
     app.MapViteHmr(nodeProxy);
 
     // Start the Vite dev server if the lockfile does not exist
-    "../MyApp.Client/dist".AssertDir();
     app.RunNodeProcess(nodeProxy,
         lockFile: "../MyApp.Client/dist/lock",
         workingDirectory: "../MyApp.Client");
