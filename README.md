@@ -1,14 +1,10 @@
 # react-static
 
-React + Vite + TypeScript + Tailwind CSS project template with ServiceStack .NET backend.
+A modern full-stack .NET 10.0 + React Vite project template that combines the power of ServiceStack with React Vite static site generation and React 19. It provides a production-ready foundation for building scalable web applications with integrated authentication, database management, and background job processing.
 
 ![](https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/wwwroot/img/pages/react/react-static.webp)
 
 > Browse [source code](https://github.com/NetCoreTemplates/react-static), view live demo [react-static.web-templates.io](http://react-static.web-templates.io) and install with:
-
-A modern full-stack .NET 10.0 + React Vite project template that combines the power of ServiceStack with React Vite static site generation and React 19. It provides a production-ready foundation for building scalable web applications with integrated authentication, database management, and background job processing.
-
-## Quick Start
 
 ```bash
 npx create-net react-static MyProject
@@ -17,6 +13,10 @@ npx create-net react-static MyProject
 ## Jumpstart with Copilot
 
 Instantly [scaffold a new App with this template](https://github.com/new?template_name=react-static&template_owner=NetCoreTemplates) using GitHub Copilot, just describe the features you want and watch Copilot build it!
+
+## [react-templates.net](https://react-templates.net)
+
+[![](https://github.com/ServiceStack/servicestack.net/blob/main/MyApp/wwwroot/img/posts/vibecode-react-templates/bg.webp?raw=true)](https://react-templates.net)
 
 ## Getting Started
 
