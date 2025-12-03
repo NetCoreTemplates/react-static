@@ -38,7 +38,7 @@ services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AdditionalUserC
 services.AddServiceStack(typeof(MyServices).Assembly);
 
 var app = builder.Build();
-var nodeProxy = new NodeProxy("http://localhost:5173") {
+var nodeProxy = new NodeProxy("http://127.0.0.1:5173") {
     Log = app.Logger
 };
 
@@ -72,14 +72,13 @@ app.UseServiceStack(new AppHost(), options => {
 // Proxy development HMR WebSocket and fallback routes to the Node server
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebSockets();
-    app.MapViteHmr(nodeProxy);
-
     // Start the Vite dev server if the lockfile does not exist
     app.RunNodeProcess(nodeProxy,
         lockFile: "../MyApp.Client/dist/lock",
         workingDirectory: "../MyApp.Client");
 
+    app.UseWebSockets();
+    app.MapViteHmr(nodeProxy);
     app.MapFallbackToNode(nodeProxy);
 }
 else
