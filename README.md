@@ -6,6 +6,8 @@ A modern full-stack .NET 10.0 + React Vite project template that combines the po
 
 > Browse [source code](https://github.com/NetCoreTemplates/react-static), view live demo [react-static.web-templates.io](http://react-static.web-templates.io) and install with:
 
+## Quick Start
+
 ```bash
 npx create-net react-static MyProject
 ```
