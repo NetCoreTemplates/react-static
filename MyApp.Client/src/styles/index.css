@@ -55,7 +55,7 @@
 
 /* override element defaults */
 b, strong { font-weight:600; }
-[type='button'],button[type='submit']{cursor:pointer}
+[type='button'],button[type='submit'],button[href]{cursor:pointer}
 
 /*typography*/
 .prose pre::-webkit-scrollbar, .prose code::-webkit-scrollbar {
