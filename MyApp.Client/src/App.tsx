@@ -46,8 +46,8 @@ function App() {
                             </SecondaryButton>
                         </div>
                     </>)
-                    : (<SecondaryButton href="/profile" className="m-2">
-                        Sign In
+                    : (<SecondaryButton href="/profile" className="items-center">
+                        🙍🏻‍♂️ My Profile
                     </SecondaryButton>)
                 }
             </div>

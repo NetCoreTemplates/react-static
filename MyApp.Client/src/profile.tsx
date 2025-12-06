@@ -1,10 +1,10 @@
 import Page from "@/components/Page"
-import { PrimaryButton, SecondaryButton, TextLink } from "@servicestack/react"
+import { PrimaryButton, SecondaryButton } from "@servicestack/react"
 import { appAuth, ValidateAuth } from "@/lib/auth"
 
 function Profile() {
     const { user, signOut } = appAuth()
-    return (<Page title={user.displayName + ' Profile'}>
+    return (<Page title={(user!.displayName || user!.userName) + ' Profile'}>
         <div className="mx-auto flex flex-col items-center">
             <img className="my-4 size-36 rounded-full" src={user.profileUrl} alt="User Profile"/>
             <div className="text-gray-900 dark:text-gray-100">{user.displayName}</div>
@@ -18,9 +18,9 @@ function Profile() {
             <PrimaryButton className="mt-8" href="/Identity/Account/Manage">
                 Identity Auth Account            
             </PrimaryButton>
-            <TextLink className="mt-8" href="/">
+            <SecondaryButton className="mt-8" href="/">
                 🏠 Home
-            </TextLink>
+            </SecondaryButton>
         </div>
     </Page>)
 }
