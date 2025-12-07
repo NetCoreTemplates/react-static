@@ -68,7 +68,7 @@ dotnet watch
 - **ASP.NET Core Identity** - Complete authentication & authorization system
 - **Entity Framework Core** - For Identity data management
 - **OrmLite** - ServiceStack's fast, lightweight Typed ORM for application data
-- **SQLite** - Default database (easily upgradable to PostgreSQL/SQL Server/MySQL)
+- **SQLite** - Default database - [Upgrade to PostgreSQL/SQL Server/MySQL](#upgrading-to-enterprise-database)
 
 ## Major Features
 
@@ -92,7 +92,7 @@ dotnet watch
 - Command pattern for job execution
 - Email sending via background jobs
 - Recurring job scheduling support
-- Upgradable to `DatabaseJobsFeature` for enterprise RDBMS
+- Uses monthly rolling Sqlite databases by default - [Upgrade to PostgreSQL/SQL Server/MySQL](#upgrading-to-enterprise-database)
 
 ### 4. Developer Experience
 - **Admin UI** at `/admin-ui` for App management
@@ -186,6 +186,7 @@ npm run test:ui     # Run tests with UI
 npm run test:run    # Run tests once
 ```
 
+
 ## Configuration
 
 ### Key Configuration Files
@@ -266,6 +267,73 @@ npx add-in ef-postgres
 npx add-in db-identity
 ```
 
+## AutoQuery CRUD Dev Workflow
+
+For Rapid Development simple [TypeScript Data Models](https://docs.servicestack.net/autoquery/okai-models) can be used to generate C# AutoQuery APIs and DB Migrations.
+
+### Cheat Sheet
+
+### Create a new Table
+
+Create a new Table use `init <Table>`, e.g:
+
+```bash
+npx okai init Table
+```
+
+This will generate an empty `MyApp.ServiceModel/<Table>.d.ts` file along with stub AutoQuery APIs and DB Migration implementations. 
+
+### Use AI to generate the TypeScript Data Model
+
+Or to get you started quickly you can also use AI to generate the initial TypeScript Data Model with:
+
+```bash
+npx okai "Table to store Customer Stripe Subscriptions"
+```
+
+This launches a TUI that invokes ServiceStack's okai API to fire multiple concurrent requests to frontier cloud 
+and OSS models to generate the TypeScript Data Models required to implement this feature. 
+You'll be able to browse and choose which of the AI Models you prefer which you can accept by pressing `a` 
+to `(a) accept`. These are the data models [Claude Sonnet 4.5 generated](https://servicestack.net/text-to-blazor?id=1764337230546) for this prompt.
+
+#### Regenerate AutoQuery APIs and DB Migrations
+
+After modifying the `Table.d.ts` TypeScript Data Model to include the desired fields, re-run the `okai` tool to re-generate the AutoQuery APIs and DB Migrations:
+
+```bash
+npx okai Table.d.ts
+```
+
+> Command can be run anywhere within your Solution
+
+After you're happy with your Data Model you can run DB Migrations to run the DB Migration and create your RDBMS Table:
+
+```bash
+npm run migrate
+```
+
+#### Making changes after first migration
+
+If you want to make further changes to your Data Model, you can re-run the `okai` tool to update the AutoQuery APIs and DB Migrations, then run the `rerun:last` npm script to drop and re-run the last migration:
+
+```bash
+npm run rerun:last
+```
+
+#### Removing a Data Model and all generated code
+
+If you changed your mind and want to get rid of the RDBMS Table you can revert the last migration:
+
+```bash
+npm run revert:last
+```
+
+Which will drop the table and then you can get rid of the AutoQuery APIs, DB Migrations and TypeScript Data model with:
+
+```bash
+npx okai rm Transaction.d.ts
+```
+
 ## Deployment
 
 ### Docker + Kamal
@@ -316,58 +384,45 @@ These are inferred from the GitHub Action context and don't need to be configure
 - **GitHub Container Registry** integration
 - **Volume persistence** for App_Data including any SQLite database
 
+## AI-Assisted Development with CLAUDE.md
 
-## AutoQuery CRUD Dev Workflow
+As part of our objectives of improving developer experience and embracing modern AI-assisted development workflows - all new .NET SPA templates include a comprehensive `AGENTS.md` file designed to optimize AI-assisted development workflows.
 
-For Rapid Development simple [TypeScript Data Models](https://docs.servicestack.net/autoquery/okai-models) can be used to generate C# AutoQuery APIs and DB Migrations.
+### What is CLAUDE.md?
 
-### Cheat Sheet
+`CLAUDE.md` and [AGENTS.md](https://agents.md) onboards Claude (and other AI assistants) to your codebase by using a structured documentation file that provides it with complete context about your project's architecture, conventions, and technology choices. This enables more accurate code generation, better suggestions, and faster problem-solving.
 
-Create a new Table use `init <Table>`, e.g:
+### What's Included
 
-```bash
-npx okai init Table
-```
+Each template's `AGENTS.md` contains:
 
-This will generate an empty `MyApp.ServiceModel/<Table>.d.ts` file along with stub AutoQuery APIs and DB Migration implementations. 
+- **Project Architecture Overview** - Technology stack, design patterns, and key architectural decisions
+- **Project Structure** - Gives Claude a map of the codebase
+- **ServiceStack Conventions** - DTO patterns, Service implementation, AutoQuery, Authentication, and Validation
+- **API Integration** - TypeScript DTO generation, API client usage, component patterns, and form handling
+- **Database Patterns** - OrmLite setup, migrations, and data access patterns
+- **Common Development Tasks** - Step-by-step guides for adding APIs, implementing features, and extending functionality
+- **Testing & Deployment** - Test patterns and deployment workflows
 
-#### Regenerate AutoQuery APIs and DB Migrations
+### Extending with Project-Specific Details
 
-After modifying the TypeScript Data Model to include the desired fields, re-run the `okai` tool to re-generate the AutoQuery APIs and DB Migrations:
+The existing `CLAUDE.md` serves as a solid foundation, but for best results, you should extend it with project-specific details like the purpose of the project, key parts and features of the project and any unique conventions you've adopted.
 
-```bash
-npx okai Table.d.ts
-```
+### Benefits
 
-> Command can be run anywhere within your Solution
+- **Faster Onboarding** - New developers (and AI assistants) understand project conventions immediately
+- **Consistent Code Generation** - AI tools generate code following your project's patterns
+- **Better Context** - AI assistants can reference specific ServiceStack patterns and conventions
+- **Reduced Errors** - Clear documentation of framework-specific conventions
+- **Living Documentation** - Keep it updated as your project evolves
 
-After you're happy with your Data Model you can run DB Migrations to run the DB Migration and create your RDBMS Table:
+### How to Use
 
-```bash
-npm run migrate
-```
+Claude Code and most AI Assistants already support automatically referencing `CLAUDE.md` and `AGENTS.md` files, for others you can just include it in your prompt context when asking for help, e.g:
 
-#### Making changes after first migration
+> Using my project's AGENTS.md, can you help me add a new AutoQuery API for managing Products?
 
-If you want to make further changes to your Data Model, you can re-run the `okai` tool to update the AutoQuery APIs and DB Migrations, then run the `rerun:last` npm script to drop and re-run the last migration:
-
-```bash
-npm run rerun:last
-```
-
-#### Removing a Data Model and all generated code
-
-If you changed your mind and want to get rid of the RDBMS Table you can revert the last migration:
-
-```bash
-npm run revert:last
-```
-
-Which will drop the table and then you can get rid of the AutoQuery APIs, DB Migrations and TypeScript Data model with:
-
-```bash
-npx okai rm Transaction.d.ts
-```
+The AI will understand your App's ServiceStack conventions, React setup, and project structure, providing more accurate and contextual assistance.
 
 ## Ideal Use Cases
 
