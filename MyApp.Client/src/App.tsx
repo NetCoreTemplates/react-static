@@ -5,10 +5,11 @@ import { AutoUis, ShellCommand, ReactLogo, TailwindLogo, TypeScriptLogo, ViteLog
 import HelloApi from './components/HelloApi'
 import { appAuth } from './lib/auth'
 import { Link } from 'react-router-dom'
+import Footer from './components/Footer'
 
 function App() {
     const { user, signOut } = appAuth()
-    return (
+    return (<>
         <div className="mt-40 max-w-screen-xl mx-auto p-8 min-h-screen flex flex-col items-center justify-center bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
             <div className="flex gap-8 mb-8 items-end">
                 <a href="https://react.dev" target="_blank" rel="noreferrer">
@@ -46,8 +47,8 @@ function App() {
                             </SecondaryButton>
                         </div>
                     </>)
-                    : (<SecondaryButton href="/profile" className="m-2">
-                        Sign In
+                    : (<SecondaryButton href="/profile" className="items-center">
+                        🙍🏻‍♂️ My Profile
                     </SecondaryButton>)
                 }
             </div>
@@ -57,7 +58,8 @@ function App() {
             <AutoUis className="mt-40 w-full" />
 
         </div>
-    )
+        <Footer />
+    </>)
 }
 
 export default App

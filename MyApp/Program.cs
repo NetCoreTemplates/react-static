@@ -38,7 +38,7 @@ services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AdditionalUserC
 services.AddServiceStack(typeof(MyServices).Assembly);
 
 var app = builder.Build();
-var nodeProxy = new NodeProxy("http://localhost:5173") {
+var nodeProxy = new NodeProxy("http://127.0.0.1:5173") {
     Log = app.Logger
 };
 
@@ -69,23 +69,17 @@ app.UseServiceStack(new AppHost(), options => {
     options.MapEndpoints();
 });
 
-// Proxy development HMR WebSocket and fallback routes to the Node server
+// Proxy HMR WebSocket and fallback routes to Node dev server in Development
 if (app.Environment.IsDevelopment())
 {
+    app.RunNodeProcess(nodeProxy, "../MyApp.Client"); // Start Node if not running
     app.UseWebSockets();
     app.MapViteHmr(nodeProxy);
-
-    // Start the Vite dev server if the lockfile does not exist
-    app.RunNodeProcess(nodeProxy,
-        lockFile: "../MyApp.Client/dist/lock",
-        workingDirectory: "../MyApp.Client");
-
-    app.MapFallbackToNode(nodeProxy);
+    app.MapFallbackToNode(nodeProxy); // Fallback to Node dev server in development
 }
 else
 {
-    // Map fallback to index.html in production (MyApp.Client/dist > wwwroot)
-    app.MapFallbackToFile("index.html");
+    app.MapFallbackToFile("index.html"); // Fallback to index.html in production (MyApp.Client/dist > wwwroot)
 }
 
 app.Run();

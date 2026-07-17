@@ -10,20 +10,12 @@ const isProd = process.env.NODE_ENV === 'production'
 const buildLocal = process.env.MODE === 'local'
 
 // Define DEPLOY_API first
-const DEPLOY_API = process.env.KAMAL_DEPLOY_HOST 
-    ? `https://${process.env.KAMAL_DEPLOY_HOST}` 
+const DEPLOY_API = process.env.KAMAL_DEPLOY_HOST
+    ? `https://${process.env.KAMAL_DEPLOY_HOST}`
     : target
 
 // Now use it for API_URL
 const API_URL = isProd ? DEPLOY_API : (buildLocal ? '' : target)
-
-// Only required if accessing vite directly, e.g. http://localhost:5173
-const proxy = {
-        '^/api': {
-            target,
-            secure: false
-        }
-    }
 
 export default defineConfig({
     define: { apiBaseUrl: `"${API_URL}"` },
@@ -40,6 +32,7 @@ export default defineConfig({
         target: 'baseline-widely-available',
     },
     server: {
-        proxy,        
-    }    
+        host: true, // Listen on all interfaces (both IPv4 and IPv6)
+        open: false,
+    }
 })
