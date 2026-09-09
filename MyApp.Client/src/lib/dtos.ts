@@ -1,6 +1,6 @@
 /* Options:
-Date: 2025-11-26 10:05:10
-Version: 8.101
+Date: 2026-09-09 13:21:05
+Version: 10.15
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://localhost:5001
 
@@ -94,14 +94,14 @@ export class QueryDb<T> extends QueryBase
 export class AuditBase
 {
     // @DataMember(Order=1)
-    public createdDate?: string;
+    public createdDate: string;
 
     // @DataMember(Order=2)
     // @Required()
     public createdBy: string;
 
     // @DataMember(Order=3)
-    public modifiedDate?: string;
+    public modifiedDate: string;
 
     // @DataMember(Order=4)
     // @Required()
@@ -125,16 +125,6 @@ export enum RoomType
     Suite = 'Suite',
 }
 
-export class Coupon extends AuditBase
-{
-    public id: string;
-    public description: string;
-    public discount?: number;
-    public expiryDate?: string;
-
-    public constructor(init?: Partial<Coupon>) { super(init); (Object as any).assign(this, init); }
-}
-
 export class User
 {
     public id: string;
@@ -150,17 +140,13 @@ export class User
 /** @description Booking Details */
 export class Booking extends AuditBase
 {
-    public id?: number;
+    public id: number;
     public name: string;
-    public roomType?: RoomType;
-    public roomNumber?: number;
-    public bookingStartDate?: string;
+    public roomType: RoomType;
+    public roomNumber: number;
+    public bookingStartDate: string;
     public bookingEndDate?: string;
-    public cost?: number;
-    // @References("typeof(MyApp.ServiceModel.Coupon)")
-    public couponId?: string;
-
-    public discount?: Coupon;
+    public cost: number;
     public notes?: string;
     public cancelled?: boolean;
     public employee: User;
@@ -211,10 +197,10 @@ export class ResponseStatus
 export class QueryResponse<T>
 {
     // @DataMember(Order=1)
-    public offset?: number;
+    public offset: number;
 
     // @DataMember(Order=2)
-    public total?: number;
+    public total: number;
 
     // @DataMember(Order=3)
     public results: T[] = [];
@@ -443,9 +429,6 @@ export class Authenticate implements IReturn<AuthenticateResponse>, IPost
     public createResponse() { return new AuthenticateResponse(); }
 }
 
-/** @description Find Bookings */
-// @Route("/bookings/{Id}", "GET")
-// @Route("/bookings", "GET")
 // @ValidateRequest(Validator="HasRole(`Employee`)")
 export class QueryBookings extends QueryDb<Booking> implements IReturn<QueryResponse<Booking>>
 {
@@ -456,17 +439,6 @@ export class QueryBookings extends QueryDb<Booking> implements IReturn<QueryResp
     public getTypeName() { return 'QueryBookings'; }
     public getMethod() { return 'GET'; }
     public createResponse() { return new QueryResponse<Booking>(); }
-}
-
-export class QueryCoupons extends QueryDb<Coupon> implements IReturn<QueryResponse<Coupon>>
-{
-    public id?: string;
-    public ids?: string[];
-
-    public constructor(init?: Partial<QueryCoupons>) { super(init); (Object as any).assign(this, init); }
-    public getTypeName() { return 'QueryCoupons'; }
-    public getMethod() { return 'GET'; }
-    public createResponse() { return new QueryResponse<Coupon>(); }
 }
 
 // @ValidateRequest(Validator="IsAdmin")
@@ -480,23 +452,21 @@ export class QueryUsers extends QueryDb<User> implements IReturn<QueryResponse<U
     public createResponse() { return new QueryResponse<User>(); }
 }
 
-/** @description Create a new Booking */
 // @ValidateRequest(Validator="HasRole(`Employee`)")
 export class CreateBooking implements IReturn<IdResponse>, ICreateDb<Booking>
 {
     // @Validate(Validator="NotEmpty")
     public name: string;
 
-    public roomType?: RoomType;
+    public roomType: RoomType;
     // @Validate(Validator="GreaterThan(0)")
-    public roomNumber?: number;
+    public roomNumber: number;
 
-    public bookingStartDate?: string;
+    public bookingStartDate: string;
     public bookingEndDate?: string;
     // @Validate(Validator="GreaterThan(0)")
-    public cost?: number;
+    public cost: number;
 
-    public couponId?: string;
     public notes?: string;
     public cancelled?: boolean;
 
@@ -509,7 +479,7 @@ export class CreateBooking implements IReturn<IdResponse>, ICreateDb<Booking>
 // @ValidateRequest(Validator="HasRole(`Employee`)")
 export class UpdateBooking implements IReturn<IdResponse>, IPatchDb<Booking>
 {
-    public id?: number;
+    public id: number;
     public name?: string;
     public roomType?: RoomType;
     // @Validate(Validator="GreaterThan(0)")
@@ -520,7 +490,6 @@ export class UpdateBooking implements IReturn<IdResponse>, IPatchDb<Booking>
     // @Validate(Validator="GreaterThan(0)")
     public cost?: number;
 
-    public couponId?: string;
     public notes?: string;
     public cancelled?: boolean;
 
@@ -530,6 +499,7 @@ export class UpdateBooking implements IReturn<IdResponse>, IPatchDb<Booking>
     public createResponse() { return new IdResponse(); }
 }
 
+// @ValidateRequest(Validator="HasRole(`Manager`)")
 // @ValidateRequest(Validator="HasRole(`Employee`)")
 export class DeleteBooking implements IReturnVoid, IDeleteDb<Booking>
 {
@@ -538,50 +508,6 @@ export class DeleteBooking implements IReturnVoid, IDeleteDb<Booking>
 
     public constructor(init?: Partial<DeleteBooking>) { (Object as any).assign(this, init); }
     public getTypeName() { return 'DeleteBooking'; }
-    public getMethod() { return 'DELETE'; }
-    public createResponse() {}
-}
-
-// @ValidateRequest(Validator="IsAuthenticated")
-export class CreateCoupon implements IReturn<IdResponse>, ICreateDb<Coupon>
-{
-    // @Validate(Validator="NotEmpty")
-    public id: string;
-
-    // @Validate(Validator="NotEmpty")
-    public description: string;
-
-    public discount?: number;
-    public expiryDate?: string;
-
-    public constructor(init?: Partial<CreateCoupon>) { (Object as any).assign(this, init); }
-    public getTypeName() { return 'CreateCoupon'; }
-    public getMethod() { return 'POST'; }
-    public createResponse() { return new IdResponse(); }
-}
-
-// @ValidateRequest(Validator="IsAuthenticated")
-export class UpdateCoupon implements IReturn<IdResponse>, IPatchDb<Coupon>
-{
-    public id: string;
-    public description?: string;
-    public discount?: number;
-    public expiryDate?: string;
-
-    public constructor(init?: Partial<UpdateCoupon>) { (Object as any).assign(this, init); }
-    public getTypeName() { return 'UpdateCoupon'; }
-    public getMethod() { return 'PATCH'; }
-    public createResponse() { return new IdResponse(); }
-}
-
-// @ValidateRequest(Validator="IsAuthenticated")
-export class DeleteCoupon implements IReturnVoid, IDeleteDb<Coupon>
-{
-    public id?: string;
-    public ids?: string[];
-
-    public constructor(init?: Partial<DeleteCoupon>) { (Object as any).assign(this, init); }
-    public getTypeName() { return 'DeleteCoupon'; }
     public getMethod() { return 'DELETE'; }
     public createResponse() {}
 }
