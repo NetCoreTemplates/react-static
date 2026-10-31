@@ -12,6 +12,7 @@ export const Routes = {
 }
 
 export const client = new JsonServiceClient()
+// oxlint-disable-next-line react/rules-of-hooks -- useMetadata is a factory, not a React hook
 export const metadata = useMetadata(client)
 
 // Load Metadata & Auth State on Startup
