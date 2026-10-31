@@ -1,13 +1,13 @@
-import { useMetadata, authContext } from "@servicestack/react"
-import { JsonServiceClient } from "@servicestack/client"
-import { Authenticate } from "@/lib/dtos"
+import { useMetadata, authContext } from '@servicestack/react'
+import { JsonServiceClient } from '@servicestack/client'
+import { Authenticate } from '@/lib/dtos'
 
-export function isServerRoute(path:string) {
+export function isServerRoute(path: string) {
     return path.startsWith('/Identity')
 }
 
 export const Routes = {
-    signin: (redirectTo?: string) => redirectTo ? `/Identity/Account/Login?ReturnUrl=${redirectTo}` : `/signin`,
+    signin: (redirectTo?: string) => (redirectTo ? `/Identity/Account/Login?ReturnUrl=${redirectTo}` : `/signin`),
     forbidden: () => '/forbidden',
 }
 
@@ -19,18 +19,18 @@ export async function init() {
     const authCtx = authContext()
     return await Promise.all([
         metadata.loadMetadata(),
-        client.post(new Authenticate())
-            .then(r => {
+        client
+            .post(new Authenticate())
+            .then((r) => {
                 authCtx.signIn(r)
-            }).catch(() => {
-            authCtx.signOut()
-        })
+            })
+            .catch(() => {
+                authCtx.signOut()
+            }),
     ])
 }
 
-export function getRedirect(searchParams:URLSearchParams) {
+export function getRedirect(searchParams: URLSearchParams) {
     const redirect = searchParams.get('redirect')
-    return redirect && Array.isArray(redirect)
-        ? redirect[0]
-        : redirect
+    return redirect && Array.isArray(redirect) ? redirect[0] : redirect
 }
