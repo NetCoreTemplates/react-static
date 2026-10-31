@@ -13,7 +13,9 @@
     "fmt": "vp fmt",
     "test": "vp test",
     "test:run": "vp test run",
-    "test:ui": "vp test --ui"
+    "test:ui": "vp test --ui",
+    "outdated": "vp outdated",
+    "upgrade": "npx npm-check-updates@latest -u --reject vite,vite-plus,@vitest/ui && npm install"
   },
   "dependencies": {
     "@servicestack/react": "^2.0.19",
